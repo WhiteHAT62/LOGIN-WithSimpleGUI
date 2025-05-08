@@ -1,14 +1,17 @@
+import sys
 from PySide6.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QLineEdit, QPushButton, QLabel, QCheckBox, QMessageBox, QHBoxLayout
+    QApplication, QWidget, QVBoxLayout, QLineEdit,
+    QPushButton, QLabel, QCheckBox, QMessageBox,
+    QHBoxLayout, QMainWindow
 )
-from PySide6.QtGui import QFont, QCursor
+from PySide6.QtGui import QFont, QCursor, QIcon
 from PySide6.QtCore import Qt
 
 
 class LoginForm(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Login Form")
+        self.setWindowTitle("PASSWORD MANAGER")
         self.setFixedSize(400, 340)
         self.setup_ui()
 
@@ -79,7 +82,7 @@ class LoginForm(QWidget):
         password = self.password_input.text()
 
         # Dummy authentication for demonstration purposes
-        if username == "admin" and password == "password123":
+        if username == "admin" and password == "123":
             QMessageBox.information(self, "Login Successful", "Welcome, admin!")
         else:
             self.status_label.setText("Incorrect username or password. Try again.")
@@ -97,10 +100,11 @@ class LoginForm(QWidget):
 
 
 if __name__ == "__main__":
-    app = QApplication([])
+    app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon("assets/ikon_saya.ico"))
 
     # Create main window
     login_form = LoginForm()
     login_form.show()
 
-    app.exec()
+    sys.exit(app.exec())
