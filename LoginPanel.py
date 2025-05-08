@@ -12,12 +12,13 @@ class LoginForm(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("PASSWORD MANAGER")
-        self.setFixedSize(400, 340)
+        self.setFixedSize(500, 340)
         self.setup_ui()
 
     def setup_ui(self):
         # Main layout
         layout = QVBoxLayout(self)
+        layout.setContentsMargins(50, 0, 50, 0)
 
         # Title Label
         title_label = QLabel("Welcome Back!")
