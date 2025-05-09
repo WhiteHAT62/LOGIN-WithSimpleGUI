@@ -20,7 +20,7 @@ class LoadingScreen(QMainWindow):
 
     def open_login_panel(self):
         self.close()
-        from login import LoginForm 
+        from LoginPanel import LoginForm 
         self.login_panel = LoginForm()
         self.login_panel.show()
 
