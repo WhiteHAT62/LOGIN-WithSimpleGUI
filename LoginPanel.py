@@ -1,109 +1,155 @@
 import sys
-import PySide6.QtWidgets
-from PySide6.QtGui import QFont, QCursor, QIcon, QPalette, QColor, QPixmap, QMouseEvent
-from PySide6.QtCore import Qt
 
-loading_screen_shown = False
+from PySide6.QtWidgets import QLineEdit
 
-class LoginForm(PySide6.QtWidgets.QWidget):
+from PySide6.QtWidgets import (
+    QApplication, QMainWindow, QMessageBox,
+    QWidget, QLabel, QHBoxLayout, QVBoxLayout,
+    QPushButton, QStyle, QSizePolicy, QSplashScreen, QFrame
+)
+from PySide6.QtCore import Qt, QTimer
+from PySide6.QtGui import QFont, QCursor, QIcon, QPalette, QColor, QPixmap, QMouseEvent, QPainter
+
+class TitleBarLogin(QWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+        self.setFixedSize(500, 40)
+        self.setContentsMargins(0, 0, 0, 0)
+        self.setStyleSheet("background-color: #2A2A40;")
+
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+        icon = QLabel()
+        icon_pixmap = QPixmap("assets/ikon.ico").scaled(20, 20, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        icon.setPixmap(icon_pixmap)
+        icon.setStyleSheet("padding-left: 10px")
+        layout.addWidget(icon)
+
+        text = QLabel("PASSWORD MANAGER")
+        text.setStyleSheet("color: white; font-weight: bold; padding-left: 1px")
+        layout.addWidget(text)
+
+        spacer = QWidget()
+        spacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        layout.addWidget(spacer)
+
+        frame_min = QFrame()
+        frame_min.setFrameShape(QFrame.NoFrame)
+        frame_min.setStyleSheet("background-color: #2A2A40;")
+
+        layout_min_frame = QVBoxLayout()
+        layout_min_frame.setContentsMargins(0, 0, 0, 0)
+        layout_min_frame.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        tombol_min = QPushButton("⛔️")
+        tombol_min.setFixedSize(30, 30)
+        tombol_min.setFont(QFont("Arial", 14))
+        tombol_min.setStyleSheet("""
+                    QPushButton {
+                        color: white;
+                        border: none;
+                    }
+                    QPushButton:hover {
+                        background-color: #44475a;
+                    }
+                """)
+        tombol_min.clicked.connect(self.parent.showMinimized)
+        layout_min_frame.addWidget(tombol_min)
+        frame_min.setLayout(layout_min_frame)
+        layout.addWidget(frame_min)
+
+        frame_ex = QFrame()
+        frame_ex.setFrameShape(QFrame.NoFrame)
+        frame_ex.setStyleSheet("background-color: #2A2A40;")
+
+        layout_ex_frame = QHBoxLayout()
+        layout_ex_frame.setContentsMargins(0, 0, 5, 0)
+        layout_ex_frame.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        tombol_ex = QPushButton("❌")
+        tombol_ex.setFixedSize(30, 30)
+        tombol_ex.setFont(QFont("Arial", 14))
+        tombol_ex.setStyleSheet("""
+                    QPushButton {
+                        color: white;
+                        border: none;
+                    }
+                    QPushButton:hover {
+                        background-color: #44475a;
+                    }
+                """)
+        tombol_ex.clicked.connect(self.parent.close)
+        layout_ex_frame.addWidget(tombol_ex)
+        frame_ex.setLayout(layout_ex_frame)
+        layout.addWidget(frame_ex)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            try:
+                if hasattr(self.parent, 'windowHandle') and self.parent.windowHandle():
+                    self.parent.windowHandle().startSystemMove()
+                event.accept()
+            except Exception as e:
+                if hasattr(self.parent, 'windowHandle') and self.parent.windowHandle():
+                    delta = event.globalPos() - self.drag_start_position
+                    self.parent.move(self.parent.pos() + delta)
+                    self.drag_start_position = event.globalPos()
+                    event.accept()
+
+    def mouseMoveEvent(self, event):
+        if event.buttons() & Qt.LeftButton and hasattr(self, 'drag_start_position'):
+            delta = event.globalPos() - self.drag_start_position
+            self.parent.move(self.parent.pos() + delta)
+            self.drag_start_position = event.globalPos()
+            event.accept()
+
+class LoginWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("PASSWORD MANAGER")
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.Window)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setFixedSize(500, 340)
-        self.setAttribute(Qt.WA_TranslucentBackground, False)
 
-        palette = QPalette()
-        palette.setColor(QPalette.Window, QColor("#1E1E2C"))
-        palette.setColor(QPalette.WindowText, QColor("#8F94FB"))
-        self.setPalette(palette)
+        self.container = QWidget()
+        self.container.setStyleSheet("background: #1E1E2C")
+        self.setCentralWidget(self.container)
 
-        self.offset = None
-        self.setup_ui()
+        layout = QVBoxLayout(self.container)
+        layout.setContentsMargins(0, 0, 0, 0)
 
-    def setup_ui(self):
-        main_layout = PySide6.QtWidgets.QVBoxLayout(self)
-        main_layout.setContentsMargins(0, 0, 0, 0)
+        self.title_bar = TitleBarLogin(self)
+        layout.addWidget(self.title_bar)
 
-        # Custom title bar
-        title_bar = PySide6.QtWidgets.QWidget()
-        title_bar.setFixedHeight(40)
-        title_bar.setStyleSheet("background-color: #2A2A40;")
-        title_layout = PySide6.QtWidgets.QHBoxLayout(title_bar)
-        title_layout.setContentsMargins(10, 0, 10, 0)
+        self.content = QWidget()
+        content_layout = QVBoxLayout(self.content)
+        content_layout.setContentsMargins(50, 0, 50, 0)
 
-        icon_label = PySide6.QtWidgets.QLabel()
-        icon_pixmap = QPixmap("assets/ikon.ico").scaled(20, 20, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        icon_label.setPixmap(icon_pixmap)
-        title_layout.addWidget(icon_label)
+        welcome = QLabel("🔐 WELCOME BACK!")
+        welcome.setFont(QFont("Arial", 16, QFont.Bold))
+        welcome.setStyleSheet("margin-top: 15px")
+        welcome.setAlignment(Qt.AlignCenter)
+        content_layout.addWidget(welcome)
 
-        title_text = PySide6.QtWidgets.QLabel("PASSWORD MANAGER")
-        title_text.setStyleSheet("color: white; font-weight: bold;")
-        title_layout.addWidget(title_text)
-        title_layout.addStretch()
-
-        minimize_button = PySide6.QtWidgets.QPushButton("⛔️")
-        minimize_button.setFixedSize(30, 30)
-        minimize_button.setFont(QFont("Arial", 14))
-        minimize_button.setStyleSheet("""
-                    QPushButton {
-                        color: white;
-                        background: none;
-                        border: none;
-                    }
-                    QPushButton:hover {
-                        background-color: #44475a;
-                    }
-                """)
-        minimize_button.clicked.connect(self.showMinimized)
-        title_layout.addWidget(minimize_button)
-
-        close_button = PySide6.QtWidgets.QPushButton("❌")
-        close_button.setFixedSize(30, 30)
-        close_button.setFont(QFont("Arial", 14))
-        close_button.setStyleSheet("""
-                    QPushButton {
-                        color: white;
-                        background: none;
-                        border: none;
-                    }
-                    QPushButton:hover {
-                        background-color: #44475a;
-                    }
-                """)
-        close_button.clicked.connect(self.close)
-        title_layout.addWidget(close_button)
-
-        title_bar.mousePressEvent = self.mousePressEvent
-        title_bar.mouseMoveEvent = self.mouseMoveEvent
-
-        main_layout.addWidget(title_bar)
-
-        # Main login UI
-        container = PySide6.QtWidgets.QWidget()
-        container_layout = PySide6.QtWidgets.QVBoxLayout(container)
-        container_layout.setContentsMargins(50, 0, 50, 0)
-
-        title_label = PySide6.QtWidgets.QLabel("Welcome Back!")
-        title_label.setFont(QFont("Arial", 16, QFont.Bold))
-        title_label.setStyleSheet("margin-top: 15px")
-        title_label.setAlignment(Qt.AlignCenter)
-        container_layout.addWidget(title_label)
-
-        self.username_input = PySide6.QtWidgets.QLineEdit()
-        self.username_input.setPlaceholderText("Username")
+        #Tambahkan disini
+        self.username_input = QLineEdit()
+        self.username_input.setPlaceholderText(" Username")
         self.username_input.setFont(QFont("Arial", 12))
         self.username_input.setStyleSheet("background: #2A2A40; color: white; margin-top: 15px")
-        container_layout.addWidget(self.username_input)
+        self.username_input.returnPressed.connect(self.handle_login)
+        content_layout.addWidget(self.username_input)
 
-        password_layout = PySide6.QtWidgets.QHBoxLayout()
-        self.password_input = PySide6.QtWidgets.QLineEdit()
-        self.password_input.setPlaceholderText("Password")
+        password_layout = QHBoxLayout()
+        self.password_input = QLineEdit()
+        self.password_input.setPlaceholderText(" Password")
         self.password_input.setFont(QFont("Arial", 12))
         self.password_input.setStyleSheet("background: #2A2A40; color: white;")
-        self.password_input.setEchoMode(PySide6.QtWidgets.QLineEdit.Password)
+        self.password_input.setEchoMode(QLineEdit.Password)
+        self.password_input.returnPressed.connect(self.handle_login)
 
-        self.toggle_password_button = PySide6.QtWidgets.QPushButton("👁️")
+        self.toggle_password_button = QPushButton("👁️")
         self.toggle_password_button.setCheckable(True)
         self.toggle_password_button.setCursor(QCursor(Qt.PointingHandCursor))
         self.toggle_password_button.setFixedSize(30, 30)
@@ -113,13 +159,14 @@ class LoginForm(PySide6.QtWidgets.QWidget):
 
         password_layout.addWidget(self.password_input)
         password_layout.addWidget(self.toggle_password_button)
-        container_layout.addLayout(password_layout)
+        content_layout.addLayout(password_layout)
 
-        self.remember_me_checkbox = PySide6.QtWidgets.QCheckBox("Remember me")
+        from PySide6.QtWidgets import QCheckBox  # Tambahkan ini kalau belum di bagian atas
+        self.remember_me_checkbox = QCheckBox("Remember me")
         self.remember_me_checkbox.setStyleSheet("color: #B0B0C3;")
-        container_layout.addWidget(self.remember_me_checkbox)
+        content_layout.addWidget(self.remember_me_checkbox)
 
-        login_button = PySide6.QtWidgets.QPushButton("Login")
+        login_button = QPushButton("Login")
         login_button.setFont(QFont("Arial", 12, QFont.Bold))
         login_button.setStyleSheet("""
                     QPushButton {
@@ -132,65 +179,72 @@ class LoginForm(PySide6.QtWidgets.QWidget):
                     }
                 """)
         login_button.clicked.connect(self.handle_login)
-        container_layout.addWidget(login_button)
+        content_layout.addWidget(login_button)
 
-        signup_label = PySide6.QtWidgets.QLabel('<a href="#">Belum memiliki akun? Daftar di sini</a>')
+        signup_label = QLabel('<a href="#">Belum memiliki akun? Daftar di sini</a>')
         signup_label.setFont(QFont("Arial", 10))
         signup_label.setAlignment(Qt.AlignCenter)
         signup_label.setStyleSheet("color: #00D9FF;")
         signup_label.setOpenExternalLinks(False)
         signup_label.setCursor(QCursor(Qt.PointingHandCursor))
         signup_label.linkActivated.connect(self.handle_signup)
-        container_layout.addWidget(signup_label)
+        content_layout.addWidget(signup_label)
 
-        self.status_label = PySide6.QtWidgets.QLabel("")
+        self.status_label = QLabel("")
         self.status_label.setAlignment(Qt.AlignCenter)
         self.status_label.setStyleSheet("color: red; font-size: 12px;")
-        container_layout.addWidget(self.status_label)
+        content_layout.addWidget(self.status_label)
 
-        main_layout.addWidget(container)
+        layout.addWidget(self.content)
 
     def handle_login(self):
         username = self.username_input.text()
         password = self.password_input.text()
 
         if username == "admin" and password == "123":
-            PySide6.QtWidgets.QMessageBox.information(self, "Login Successful", "Welcome, admin!")
+            QMessageBox.information(self, "Login Successful", "Welcome, admin!")
         else:
             self.status_label.setText("Incorrect username or password. Try again.")
 
     def handle_signup(self):
-        PySide6.QtWidgets.QMessageBox.information(self, "Signup", "Redirecting to signup page...")
+        QMessageBox.information(self, "Signup", "Redirecting to signup page...")
 
     def toggle_password_visibility(self):
         if self.toggle_password_button.isChecked():
-            self.password_input.setEchoMode(PySide6.QtWidgets.QLineEdit.Normal)
+            self.password_input.setEchoMode(QLineEdit.Normal)
             self.toggle_password_button.setText("🙈")
         else:
-            self.password_input.setEchoMode(PySide6.QtWidgets.QLineEdit.Password)
+            self.password_input.setEchoMode(QLineEdit.Password)
             self.toggle_password_button.setText("👁️")
 
-        # Custom move window with mouse drag
 
-    def mousePressEvent(self, event: QMouseEvent):
-        if event.button() == Qt.LeftButton:
-            self.offset = event.globalPosition().toPoint() - self.pos()
+def show_login():
+    window = LoginWindow()
+    splash.close()
+    window.show()
 
-    def mouseMoveEvent(self, event: QMouseEvent):
-        if self.offset and event.buttons() == Qt.LeftButton:
-            self.move(event.globalPosition().toPoint() - self.offset)
+def add_padding_to_pixmap(pixmap, padding_bottom):
+    new_height = pixmap.height() + padding_bottom
+    padded_pixmap = QPixmap(pixmap.width(), new_height)
+    padded_pixmap.fill(Qt.transparent)
+
+    painter = QPainter(padded_pixmap)
+    painter.drawPixmap(0, 0, pixmap)
+    painter.end()
+
+    return padded_pixmap
 
 if __name__ == "__main__":
-    app = PySide6.QtWidgets.QApplication(sys.argv)
-    app.setWindowIcon(QIcon("assets/ikon.ico"))
+    app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon("assets/ikon_saya.png"))
 
-    if not globals().get("loading_screen_shown", False):
-        from hello import LoadingScreen
-        loading_screen_shown = True
-        loading_screen = LoadingScreen()
-        loading_screen.show()
-        sys.exit(app.exec())
-    else:
-        login_panel = LoginForm()
-        login_panel.show()
-        sys.exit(app.exec())
+    original_pix = QPixmap("assets/ikon_saya.png").scaled(300, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+    splash_pix = add_padding_to_pixmap(original_pix, 10)
+    splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
+    splash.setFont(QFont("Arial", 12))
+    splash.showMessage("Memuat aplikasi...", Qt.AlignBottom | Qt.AlignCenter, Qt.white)
+    splash.show()
+
+    # Delay 2 detik sebelum tampilkan login window
+    QTimer.singleShot(2000, show_login)
+    sys.exit(app.exec())
