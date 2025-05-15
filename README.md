@@ -18,13 +18,13 @@ A simple desktop login system built with Python using **PySide6** for the GUI an
 
 ## 📂 Project Structure
 ``` bash
-├── assets/             # Icons and images
-├── database/           # SQLite database and init scripts
-├── src/                # Main application code
-│   ├── login.py        # Login form with session & token
-│   ├── signup.py       # Signup form and validation
-│   └── main.py         # App entry point
-└── README.md           # Project documentation
+├── assets/                  # Icons and images
+├── database/                # SQLite database and init scripts
+├── src/                     # Main application code
+│   ├── main.py              # Login form with session & token
+│   ├── login.py             # Signup form and validation
+│   └── halamanutama.py      # App entry point
+└── README.md                # Project documentation
 ```
 
 # 🔑 How It Works
