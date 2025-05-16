@@ -43,5 +43,5 @@ A simple desktop login system built with Python using **PySide6** for the GUI an
 git clone https://github.com/WhiteHAT62/StudyKasus-AppLOGIN-WithSimpleGUI
 cd StudyKasus-AppLOGIN-WithSimpleGUI
 pip install -r requirements.txt
-python src/main.py
+python main.py
 ```
