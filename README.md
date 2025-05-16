@@ -18,12 +18,10 @@ A simple desktop login system built with Python using **PySide6** for the GUI an
 
 ## 📂 Project Structure
 ``` bash
-├── assets/                  # Icons and images
-├── database/                # SQLite database and init scripts
-├── src/                     # Main application code
-│   ├── main.py              # Login form with session & token
-│   ├── login.py             # Signup form and validation
-│   └── halamanutama.py      # App entry point
+├── assets/                  # Icons and images         
+├── main.py                  # Main application code and App entry point
+├── login.py                 # Login, Signup form and validation
+├── halamanutama.py          # Exsampe goal
 └── README.md                # Project documentation
 ```
 
@@ -42,8 +40,8 @@ A simple desktop login system built with Python using **PySide6** for the GUI an
 
 # 📦 Installation
 ``` bash
-git clone https://github.com/WhiteHAT62/LOGIN-WithSimpleGUI.git
-cd LOGIN-WithSimpleGUI
+git clone https://github.com/WhiteHAT62/StudyKasus-AppLOGIN-WithSimpleGUI
+cd StudyKasus-AppLOGIN-WithSimpleGUI
 pip install -r requirements.txt
 python src/main.py
 ```
