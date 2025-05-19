@@ -1,3 +1,5 @@
+![GitHub License](https://img.shields.io/github/license/WhiteHAT62/FastAPI-demo4portofolio)
+
 # LOGIN-WithSimpleGUI
 
 A simple desktop login system built with Python using **PySide6** for the GUI and **SQLite** for the database.
