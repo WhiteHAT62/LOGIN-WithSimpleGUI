@@ -1,6 +1,6 @@
 ![GitHub License](https://img.shields.io/github/license/WhiteHAT62/FastAPI-demo4portofolio)
 
-# LOGIN-WithSimpleGUI
+# Dekstop LOGIN-WithSimpleGUI
 
 A simple desktop login system built with Python using **PySide6** for the GUI and **SQLite** for the database.
 
@@ -42,8 +42,8 @@ A simple desktop login system built with Python using **PySide6** for the GUI an
 
 # 📦 Installation
 ``` bash
-git clone https://github.com/WhiteHAT62/StudyKasus-AppLOGIN-WithSimpleGUI
-cd StudyKasus-AppLOGIN-WithSimpleGUI
+git clone https://github.com/WhiteHAT62/PySide6-demo4portofolio
+cd PySide6-demo4portofolio
 pip install -r requirements.txt
 python main.py
 ```
